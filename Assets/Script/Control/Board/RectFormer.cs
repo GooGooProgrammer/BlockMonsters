@@ -46,7 +46,7 @@ public class RectFormer : MonoBehaviour
         else if (corners.Count == 4)
         {
             //for 4 corners, if 1 corner minus another 1 corner, one of the x/y must be 0 (cuz straight line)
-            if (!CheckStraghtLine(corners) && !CheckInside(corners))
+            if (!CheckStraghtLine(corners) || !CheckInside(corners))
             {
                 return null; // return means no rect form
             }
@@ -120,9 +120,9 @@ public class RectFormer : MonoBehaviour
     //Check whether inside is full
     private bool CheckInside(List<Vector2> corners)
     {
-        for (int x = (int)corners[2].x; x < (int)corners[0].x; x++)
+        for (int x = (int)corners[2].x; x <= (int)corners[0].x; x++)
         {
-            for (int y = (int)corners[2].y; y < (int)corners[0].y; y++)
+            for (int y = (int)corners[2].y; y <= (int)corners[0].y; y++)
             {
                 if (!magicBoard.IsOccuplied[x, y])
                 {

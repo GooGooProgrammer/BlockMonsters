@@ -13,6 +13,7 @@ public class MonsterPlacer : MonoBehaviour
 
         void Start()
     {
+        //Problem: Dont get reference by name
         boardPlacer = GameObject.Find("MagicBoard").GetComponent<BoardPlacer>();
         shadowSpawner = GameObject.Find("MagicBoard").GetComponent<ShadowSpawner>();
     }

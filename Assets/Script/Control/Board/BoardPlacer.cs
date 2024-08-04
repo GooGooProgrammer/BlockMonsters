@@ -86,7 +86,7 @@ public class BoardPlacer : MonoBehaviour
 
         MonstersOnBoard.Add(Grid.transform.localPosition, monster);
 
-        //the script below should be in a new class
+        //Problem: the script below should be in a new class
         List<Vector2> blockRect = rectFormer.MonsterFormRect(Grid);
 
         if (blockRect != null)
