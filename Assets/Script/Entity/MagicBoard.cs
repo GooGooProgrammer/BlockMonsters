@@ -9,8 +9,9 @@ public class MagicBoard : MonoBehaviour
 
     [SerializeField]
     private GameObject GridPrefabs;
-    private GameObject[,] Grids;
-    private bool[,] isOccuplied;
+    private GameObject[,] Grids = new GameObject[boardSizeX, boardSizeY];
+    private bool[,] isOccuplied = new bool[boardSizeX, boardSizeY];
+  
 
     // Start is called before the first frame update
     void Start()
@@ -22,8 +23,6 @@ public class MagicBoard : MonoBehaviour
     void SpawnBoard()
     {
         //create grids can put them into grids[,]
-        Grids = new GameObject[boardSizeX, boardSizeY];
-        isOccuplied = new bool[boardSizeX, boardSizeY];
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)

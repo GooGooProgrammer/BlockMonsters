@@ -16,7 +16,7 @@ public class BlockMonster : MonoBehaviour
 {
     [SerializeField] private string monsterName;
     [SerializeField] private Type type;
-    [SerializeField] private bool isActive = true;
+    [SerializeField] private bool isActive = true; //isActive currently in the hand
     void Start()
     {
         BlockDataConstruct();

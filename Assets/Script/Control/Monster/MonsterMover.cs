@@ -15,13 +15,11 @@ public class MonsterMover : MonoBehaviour
     Vector2 mouseDiff;
 
     //The Grid which is touching the monster, null if no grid is touching
-    private BoardPlacer boardPlacer;
     private MonsterPlacer monsterPlacer;
     private ShadowSpawner shadowSpawner;
 
     void Start()
     {
-        boardPlacer = GameObject.Find("MagicBoard").GetComponent<BoardPlacer>();
         shadowSpawner = GameObject.Find("MagicBoard").GetComponent<ShadowSpawner>();
 
         monsterPlacer = transform.GetComponent<MonsterPlacer>();

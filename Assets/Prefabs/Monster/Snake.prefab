@@ -70,6 +70,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -8125666948740734585, guid: c7bd0c258d898f2488d9df81d97951c1, type: 3}
+      propertyPath: monsterName
+      value: Snake
+      objectReference: {fileID: 0}
     - target: {fileID: 5570310364448957553, guid: c7bd0c258d898f2488d9df81d97951c1, type: 3}
       propertyPath: m_Name
       value: Snake

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4896475050735875674}
   - component: {fileID: -6627510000329844318}
   - component: {fileID: 8209894718597047233}
+  - component: {fileID: 5595743647830757259}
   m_Layer: 0
   m_Name: MagicBoard
   m_TagString: Board
@@ -69,5 +70,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fd1193dbfbbb1f74fb6c890b86d05df8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5595743647830757259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832717950005145947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45760919d02e90047bf27d860290c7a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

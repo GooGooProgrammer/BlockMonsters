@@ -10,19 +10,22 @@ public class BoardPlacer : MonoBehaviour
 
     private MagicBoard magicBoard;
     private ShadowSpawner shadowSpawner;
+    private RectFormer rectFormer;
+
+    private Dictionary<Vector2, GameObject> MonstersOnBoard = new Dictionary<Vector2, GameObject>();
 
     // Start is called before the first frame update
     void Start()
     {
         magicBoard = GetComponent<MagicBoard>();
         shadowSpawner = GetComponent<ShadowSpawner>();
-
+        rectFormer = GetComponent<RectFormer>();
     }
 
-    public GameObject GetGridTouching(Vector3 MonsterPos)
+    public GameObject GetGridTouching(Vector3 monsterPos)
     {
-        int x = (int)Math.Floor(MonsterPos.x - transform.position.x);
-        int y = (int)Math.Floor(MonsterPos.y - transform.position.y);
+        int x = (int)Math.Floor(monsterPos.x - transform.position.x);
+        int y = (int)Math.Floor(monsterPos.y - transform.position.y);
         if (x >= 0 && x < MagicBoard.boardSizeX && y >= 0 && y < MagicBoard.boardSizeX)
         {
             return magicBoard.GetGrid(x, y);
@@ -30,18 +33,18 @@ public class BoardPlacer : MonoBehaviour
         return null;
     }
 
-    public bool CheckMonsterCanPlace(GameObject Monster, GameObject Grid)
+    public bool CheckMonsterCanPlace(GameObject monster, GameObject Grid)
     {
         Vector3 gridPos = Grid.transform.localPosition;
 
-        for (int i = 0; i < Monster.transform.childCount; i++)
+        for (int i = 0; i < monster.transform.childCount; i++)
         {
             if (i != 0)
             {
                 //the position differnce between block[i-1] and block[i]
                 Vector3 blockDiff =
-                    Monster.transform.GetChild(i).localPosition
-                    - Monster.transform.GetChild(i - 1).localPosition;
+                    monster.transform.GetChild(i).localPosition
+                    - monster.transform.GetChild(i - 1).localPosition;
                 gridPos = gridPos + blockDiff;
             }
 
@@ -62,137 +65,49 @@ public class BoardPlacer : MonoBehaviour
         return true;
     }
 
-    public void PlaceMonsterOnBoard(GameObject Monster, GameObject Grid)
+    public void PlaceMonsterOnBoard(GameObject monster, GameObject Grid)
     {
         shadowSpawner.DestroyShadow();
-        Monster.transform.position = Grid.transform.position;
+        monster.transform.position = Grid.transform.position;
         Vector3 gridPos = Grid.transform.localPosition;
-        for (int i = 0; i < Monster.transform.childCount; i++)
+        for (int i = 0; i < monster.transform.childCount; i++)
         {
             if (i != 0)
             {
                 //the position differnce between block[i-1] and block[i]
                 Vector3 blockDiff =
-                    Monster.transform.GetChild(i).localPosition
-                    - Monster.transform.GetChild(i - 1).localPosition;
+                    monster.transform.GetChild(i).localPosition
+                    - monster.transform.GetChild(i - 1).localPosition;
                 gridPos = gridPos + blockDiff;
             }
 
             magicBoard.IsOccuplied[(int)Math.Floor(gridPos.x), (int)Math.Floor(gridPos.y)] = true;
         }
 
-        MonsterFormRect(Grid);
-    }
+        MonstersOnBoard.Add(Grid.transform.localPosition, monster);
 
-    //array to store the corners of the monster(s)
-    List<Vector2> corners;
+        //the script below should be in a new class
+        List<Vector2> blockRect = rectFormer.MonsterFormRect(Grid);
 
-    //4 direction for check whether there is a rect
-    //Top Right, Bottom Right, Bottom Left, Top Left
-    private int[,] Direction =
-    {
-        { 1, 1 },
-        { 1, -1 },
-        { -1, -1 },
-        { -1, 1 }
-    };
-
-    //MonsterFormRect used to check whether the placed monster can form a rect
-    public void MonsterFormRect(GameObject Grid)
-    {
-        corners = new List<Vector2>();
-
-        int gridPosX = (int)Math.Floor(Grid.transform.localPosition.x);
-        int gridPosY = (int)Math.Floor(Grid.transform.localPosition.y);
-
-        //To find the 4 corners of rect
-        for (int i = 0; i < 4; i++)
+        if (blockRect != null)
         {
-            FindCorner(gridPosX, gridPosY, i);
-        }
-        //if corners num are 1 2 it must be a rect
-        //else if 4 then it maybe, other num is impossible
-        if (corners.Count == 1 || corners.Count == 2)
-        {
-            Debug.Log("rectForm");
-        }
-        else if (corners.Count == 4)
-        {
-            //for 4 corners, if 1 corner minus another 1 corner, one of the x/y must be 0 (cuz straight line)
 
-            Vector2 cache = corners[3];
+            rectFormer.ClearOccupliedInRect(blockRect);
 
-            foreach (Vector2 c in corners)
+            GameObject monsterGonnaDelete;
+
+            for (float x = blockRect[2].x; x <= blockRect[0].x; x++)
             {
-                cache.x -= c.x;
-                cache.y -= c.y;
-                if (cache.x != 0 && cache.y != 0) // for those not straight line, return
+                for (float y = blockRect[2].y; y <= blockRect[0].y; y++)
                 {
-                    return;
-                }
-                cache.x = c.x;
-                cache.y = c.y;
-            }
-
-            //Check whether inside is full
-            for (int x = (int)corners[2].x; x < (int)corners[0].x; x++)
-            {
-                for (int y = (int)corners[2].y; y < (int)corners[0].y; y++)
-                {
-                    if (!magicBoard.IsOccuplied[x, y])
+                    if(MonstersOnBoard.TryGetValue(new Vector2(x,y), out monsterGonnaDelete))
                     {
-                        return;
+                        Destroy(monsterGonnaDelete);
+                        MonstersOnBoard.Remove(new Vector2(x,y));
                     }
                 }
             }
         }
-        else
-            return; // return means no rect form
-
-        Debug.Log("rectForm");
-    }
-
-    public void FindCorner(int x, int y, int d)
-    {
-        //will go to the deepest to find the corner
-        int count = 0;
-        if (
-            DirectionCondition(x, Direction[d, 0]) && magicBoard.IsOccuplied[x + Direction[d, 0], y]
-        )
-        {
-            FindCorner(x + Direction[d, 0], y, d);
-            count++;
-        }
-        if (
-            DirectionCondition(y, Direction[d, 1]) && magicBoard.IsOccuplied[x, y + Direction[d, 1]]
-        )
-        {
-            FindCorner(x, y + Direction[d, 1], d);
-            count++;
-        }
-
-        //count == 0 mean the corner is Grid[x,y]
-
-        if (count == 0)
-        {
-            corners.Add(new Vector2(x, y));
-
-            if (corners.Count != corners.Distinct().Count())
-            {
-                corners.RemoveAt(corners.Count - 1);
-            }
-        }
-    }
-
-    private bool DirectionCondition(int number, int direction)
-    {
-        if (direction == 1)
-        {
-            return number < MagicBoard.boardSizeX - 1; //this assume boardX = boardY
-        }
-        else
-        {
-            return number > 0;
-        }
+        //the script ends
     }
 }
